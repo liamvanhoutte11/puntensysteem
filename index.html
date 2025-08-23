@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+  <meta charset="UTF-8">
+  <title>Punten Systeem</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: #eef2f7;
+      margin: 0;
+      padding: 0;
+    }
+    header {
+      background: linear-gradient(135deg, #4a90e2, #357ab7);
+      color: #fff;
+      padding: 20px;
+      text-align: center;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+    }
+    h1, h2, h3 {
+      margin: 0 0 10px 0;
+    }
+    .container {
+      max-width: 1100px;
+      margin: 20px auto;
+      padding: 20px;
+    }
+    .card {
+      background: #fff;
+      border-radius: 16px;
+      padding: 20px;
+      margin-bottom: 20px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      transition: transform 0.2s;
+    }
+    .card:hover {
+      transform: translateY(-3px);
+    }
+    input, button {
+      margin: 6px 0;
+      padding: 12px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      width: 100%;
+      box-sizing: border-box;
+    }
+    button {
+      background: #4a90e2;
+      color: #fff;
+      border: none;
+      cursor: pointer;
+      font-weight: bold;
+      transition: background 0.3s;
+    }
+    button:hover {
+      background: #357ab7;
+    }
+    button.success { background: #28a745; }
+    button.success:hover { background: #218838; }
+    button.danger { background: #dc3545; }
+    button.danger:hover { background: #c82333; }
+    ul { list-style: none; padding: 0; }
+    li {
+      background: #f9f9f9;
+      margin: 6px 0;
+      padding: 12px;
+      border-radius: 10px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    #chatBox {
+      border: 1px solid #ddd;
+      border-radius: 10px;
+      background: #fafafa;
+      height: 220px;
+      overflow-y: auto;
+      padding: 12px;
+    }
+    #chatBox p { margin: 6px 0; }
+    #chatBox b { color: #357ab7; }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>🌟 Punten Systeem</h1>
+    <p>Ouders beheren taken, beloningen en punten voor kinderen</p>
+  </header>
+
+  <div class="container">
+
+    <div id="loginCard" style="padding:20px; border:1px solid #ccc; border-radius:8px; width:300px; margin:20px auto;">
+  <h3>Login</h3>
+  <input id="loginName" placeholder="Naam" style="width:100%; margin-bottom:5px;"><br>
+  <input id="loginPassword" type="password" placeholder="Wachtwoord/PIN" style="width:100%; margin-bottom:5px;"><br>
+  <button onclick="login()" style="width:100%;">Login</button>
+</div>
+
+<div id="registerCard" style="padding:20px; border:1px solid #ccc; border-radius:8px; width:300px; margin:20px auto;">
+  <h3>Registreer als Ouder</h3>
+  <input id="registerName" placeholder="Naam" style="width:100%; margin-bottom:5px;"><br>
+  <input id="registerPassword" type="password" placeholder="Wachtwoord" style="width:100%; margin-bottom:5px;"><br>
+  <button onclick="registerParent()" style="width:100%;">Registreer</button>
+</div>
+
+
+    <!-- Ouder Panel -->
+    <div id="parentPanel" style="display:none;">
+      <div class="card">
+        <h2>👨‍👩‍👧 Ouder Dashboard</h2>
+        <button class="danger" onclick="logout()">Uitloggen</button>
+      </div>
+      <div class="card">
+        <h3>Kind toevoegen</h3>
+        <input type="text" id="childName" placeholder="Naam kind">
+        <button onclick="addChild()">Kind toevoegen</button>
+        <ul id="childrenList"></ul>
+      </div>
+      <div class="card">
+        <h3>Taken beheren</h3>
+        <input type="text" id="taskName" placeholder="Taaknaam">
+        <input type="number" id="taskPoints" placeholder="Punten">
+        <button onclick="addTask()">Taak toevoegen</button>
+        <ul id="tasksList"></ul>
+      </div>
+      <div class="card">
+        <h3>Beloningen beheren</h3>
+        <input type="text" id="rewardName" placeholder="Beloning">
+        <input type="number" id="rewardCost" placeholder="Kosten (punten)">
+        <button onclick="addReward()">Beloning toevoegen</button>
+        <ul id="rewardsList"></ul>
+      </div>
+      <div class="card">
+        <h3>Goedkeuringen</h3>
+        <h4>Taakaanvragen</h4>
+        <ul id="taskRequestsList"></ul>
+        <h4>Beloningsaanvragen</h4>
+        <ul id="rewardRequestsList"></ul>
+      </div>
+      <div class="card">
+        <h3>💬 Chat met kinderen</h3>
+        <div id="chatBox"></div>
+        <input type="text" id="chatMessage" placeholder="Bericht typen...">
+        <button onclick="sendMessage()">Verstuur</button>
+      </div>
+    </div>
+
+    <!-- Kind Panel -->
+    <div id="childPanel" style="display:none;">
+      <div class="card">
+        <h2>👦 Welkom, <span id="childName"></span></h2>
+        <p>Punten: <span id="childPoints">0</span></p>
+        <button class="danger" onclick="logout()">Uitloggen</button>
+      </div>
+      <div class="card">
+        <h3>Mijn Taken</h3>
+        <ul id="childTasks"></ul>
+      </div>
+      <div class="card">
+        <h3>Mijn Beloningen</h3>
+        <ul id="childRewards"></ul>
+      </div>
+      <div class="card">
+        <h3>💬 Chat met ouder</h3>
+        <div id="chatBox"></div>
+        <input type="text" id="chatMessage" placeholder="Bericht typen...">
+        <button onclick="sendMessage()">Verstuur</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+
+    // --- Firebase config (VERVANG DOOR JOUW CONFIG UIT FIREBASE!) ---
+    const firebaseConfig = {
+      apiKey: "AIzaSyBHbfiepBvkphF6Jwapvp6Iits9x6D5XJU",
+      authDomain: "punten-server.firebaseapp.com",
+      databaseURL: "https://punten-server-default-rtdb.europe-west1.firebasedatabase.app/",
+      projectId: "punten-server",
+      storageBucket: "punten-server.firebasestorage.app",
+      messagingSenderId: "505787232144",
+      appId: "1:505787232144:web:c8a6d219647a88c528cd15"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+  const db = firebase.database();
+
+  let currentUser = null;
+  let isParent = false;
+
+  // --- Registratie (alleen ouder) ---
+  function registerParent(){
+    const name = document.getElementById("registerName").value;
+    const pass = document.getElementById("registerPassword").value;
+    db.ref("parent").set({name: name, pass: pass});
+    alert("Ouder geregistreerd!");
+  }
+
+  // --- Login ---
+  function login(){
+    const n = document.getElementById("loginName").value;
+    const p = document.getElementById("loginPassword").value;
+
+    // Controleer ouder
+    db.ref("parent").once("value", snap=>{
+      const parent = snap.val();
+      if(parent && parent.name === n && parent.pass === p){
+        currentUser = n;
+        isParent = true;
+        showApp();
+      } else {
+        // Controleer kind
+        db.ref("children").orderByChild("name").equalTo(n).once("value", csnap=>{
+          let found = false;
+          csnap.forEach(c=>{
+            if(c.val().pin === p){
+              currentUser = n;
+              isParent = false;
+              showApp();
+              found = true;
+            }
+          });
+          if(!found) alert("Ongeldige login");
+        });
+      }
+    });
+  }
+
+  // --- Uitloggen ---
+  function logout(){
+    currentUser = null;
+    isParent = false;
+    location.reload();
+  }
+
+  // --- App tonen ---
+  function showApp(){
+    document.getElementById("loginCard").style.display = "none";
+    document.getElementById("registerCard").style.display = "none";
+    if(isParent){
+      document.getElementById("parentPanel").style.display = "block";
+      renderParent();
+    } else {
+      document.getElementById("childPanel").style.display = "block";
+      renderChild();
+    }
+    renderChat();
+  }
+
+  // --- Ouder functies ---
+  function addChild(){
+    const name = document.getElementById("childName").value;
+    const pin = document.getElementById("childPin").value;
+    const id = db.ref("children").push().key;
+    db.ref("children/"+id).set({name: name, pin: pin, points:0, parent: currentUser});
+  }
+
+  function addTask(){
+    const task = document.getElementById("taskName").value;
+    const points = parseInt(document.getElementById("taskPoints").value);
+    db.ref("tasks").push({task: task, points: points});
+  }
+
+  function addReward(){
+    const reward = document.getElementById("rewardName").value;
+    const cost = parseInt(document.getElementById("rewardCost").value);
+    db.ref("rewards").push({reward: reward, cost: cost});
+  }
+
+  function approveTask(reqId, childId, points){
+    db.ref("children/"+childId+"/points").transaction(p=>(p||0)+points);
+    db.ref("taskRequests/"+reqId).remove();
+  }
+
+  function approveReward(reqId, childId, cost){
+    db.ref("children/"+childId+"/points").transaction(p=>(p||0)-cost);
+    db.ref("rewardRequests/"+reqId).remove();
+  }
+
+  // --- Kind functies ---
+  function requestTaskApproval(taskId, task, points){
+    db.ref("children").orderByChild("name").equalTo(currentUser).once("value", snap=>{
+      snap.forEach(c=>{
+        db.ref("taskRequests").push({child: c.key, task: task, points: points});
+      });
+    });
+    db.ref("tasks/"+taskId).remove();
+  }
+
+  function requestReward(rewardId, reward, cost){
+    db.ref("children").orderByChild("name").equalTo(currentUser).once("value", snap=>{
+      snap.forEach(c=>{
+        db.ref("rewardRequests").push({child: c.key, reward: reward, cost: cost});
+      });
+    });
+  }
+
+  // --- Rendering realtime ---
+  function renderParent(){
+    db.ref("children").on("value", snap=>{
+      let h=""; snap.forEach(c=>{h+=`<li>${c.val().name} - ${c.val().points} punten</li>`}); 
+      document.getElementById("childrenList").innerHTML = h;
+    });
+
+    db.ref("tasks").on("value", snap=>{
+      let h=""; snap.forEach(t=>{h+=`<li>${t.val().task} (${t.val().points} punten)</li>`}); 
+      document.getElementById("tasksList").innerHTML = h;
+    });
+
+    db.ref("rewards").on("value", snap=>{
+      let h=""; snap.forEach(r=>{h+=`<li>${r.val().reward} (${r.val().cost} punten)</li>`}); 
+      document.getElementById("rewardsList").innerHTML = h;
+    });
+
+    db.ref("taskRequests").on("value", snap=>{
+      let h=""; snap.forEach(r=>{
+        h+=`<li>Kind ${r.val().child} wil taak ${r.val().task} (${r.val().points} punten) 
+        <button onclick="approveTask('${r.key}','${r.val().child}',${r.val().points})">Goedkeuren</button></li>`;
+      });
+      document.getElementById("taskRequestsList").innerHTML = h;
+    });
+
+    db.ref("rewardRequests").on("value", snap=>{
+      let h=""; snap.forEach(r=>{
+        h+=`<li>Kind ${r.val().child} wil beloning ${r.val().reward} (${r.val().cost} punten) 
+        <button onclick="approveReward('${r.key}','${r.val().child}',${r.val().cost})">Goedkeuren</button></li>`;
+      });
+      document.getElementById("rewardRequestsList").innerHTML = h;
+    });
+  }
+
+  function renderChild(){
+    db.ref("children").orderByChild("name").equalTo(currentUser).on("value", snap=>{
+      snap.forEach(c=>{
+        document.getElementById("childName").innerText = c.val().name;
+        document.getElementById("childPoints").innerText = c.val().points;
+      });
+    });
+
+    db.ref("tasks").on("value", snap=>{
+      let h=""; snap.forEach(t=>{
+        h+=`<li>${t.val().task} (${t.val().points} punten)
+        <button onclick="requestTaskApproval('${t.key}','${t.val().task}',${t.val().points})">Klaar</button></li>`;
+      });
+      document.getElementById("childTasks").innerHTML = h;
+    });
+
+    db.ref("rewards").on("value", snap=>{
+      let h=""; snap.forEach(r=>{
+        h+=`<li>${r.val().reward} (${r.val().cost} punten)
+        <button onclick="requestReward('${r.key}','${r.val().reward}',${r.val().cost})">Inwisselen</button></li>`;
+      });
+      document.getElementById("childRewards").innerHTML = h;
+    });
+  }
+
+  // --- Chat ---
+  function renderChat(){
+    db.ref("chat").on("value", snap=>{
+      let h=""; snap.forEach(m=>{h+=`<p><b>${m.val().from}:</b> ${m.val().text}</p>`});
+      document.getElementById("chatBox").innerHTML = h;
+    });
+  }
+
+  function sendMessage(){
+    const msg = document.getElementById("chatMessage").value;
+    if(!msg) return;
+    db.ref("chat").push({from: isParent?"Ouder":"Kind", text: msg});
+    document.getElementById("chatMessage").value = "";
+  }
+</script>
+</body>
+</html>
