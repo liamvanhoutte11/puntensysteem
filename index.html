@@ -115,12 +115,15 @@
         <h2>👨‍👩‍👧 Ouder Dashboard</h2>
         <button class="danger" onclick="logout()">Uitloggen</button>
       </div>
-      <div class="card">
-        <h3>Kind toevoegen</h3>
-        <input type="text" id="childName" placeholder="Naam kind">
-        <button onclick="addChild()">Kind toevoegen</button>
-        <ul id="childrenList"></ul>
-      </div>
+      <div id="parentPanel" style="padding:20px; border:1px solid #ccc; border-radius:8px; width:400px; margin:20px auto;">
+  <h3>Voeg een kind toe</h3>
+  <input id="childName" placeholder="Naam kind" style="width:100%; margin-bottom:5px;"><br>
+  <input id="childPin" placeholder="PIN kind" type="password" style="width:100%; margin-bottom:5px;"><br>
+  <button onclick="addChild()" style="width:100%;">Voeg kind toe</button>
+
+  <h4>Kinderen lijst</h4>
+  <ul id="childrenList" style="padding-left:0;"></ul>
+</div>
       <div class="card">
         <h3>Taken beheren</h3>
         <input type="text" id="taskName" placeholder="Taaknaam">
