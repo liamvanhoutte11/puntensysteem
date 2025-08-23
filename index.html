@@ -109,21 +109,23 @@
 </div>
 
 
-    <!-- Ouder Panel -->
-    <div id="parentPanel" style="display:none;">
-      <div class="card">
-        <h2>👨‍👩‍👧 Ouder Dashboard</h2>
-        <button class="danger" onclick="logout()">Uitloggen</button>
-      </div>
-      <div id="parentPanel" style="padding:20px; border:1px solid #ccc; border-radius:8px; width:400px; margin:20px auto;">
-  <h3>Voeg een kind toe</h3>
+   <div id="parentPanel" style="padding:20px; border:1px solid #ccc; border-radius:8px; width:400px; margin:20px auto; display:none;">
+  <h3>Ouder Paneel</h3>
+
+  <h4>Voeg een kind toe</h4>
   <input id="childName" placeholder="Naam kind" style="width:100%; margin-bottom:5px;"><br>
   <input id="childPin" placeholder="PIN kind" type="password" style="width:100%; margin-bottom:5px;"><br>
   <button onclick="addChild()" style="width:100%;">Voeg kind toe</button>
 
-  <h4>Kinderen lijst</h4>
+  <h4>Geef punten aan kind</h4>
+  <input id="pointsChildName" placeholder="Naam kind" style="width:100%; margin-bottom:5px;"><br>
+  <input id="extraPoints" placeholder="Aantal punten" type="number" style="width:100%; margin-bottom:5px;"><br>
+  <button onclick="addPoints()" style="width:100%;">Geef punten</button>
+
+  <h4>Lijst kinderen</h4>
   <ul id="childrenList" style="padding-left:0;"></ul>
 </div>
+
       <div class="card">
         <h3>Taken beheren</h3>
         <input type="text" id="taskName" placeholder="Taaknaam">
@@ -256,12 +258,55 @@
   }
 
   // --- Ouder functies ---
-  function addChild(){
-    const name = document.getElementById("childName").value;
-    const pin = document.getElementById("childPin").value;
-    const id = db.ref("children").push().key;
-    db.ref("children/"+id).set({name: name, pin: pin, points:0, parent: currentUser});
-  }
+  // Voeg kind toe
+function addChild() {
+  const name = document.getElementById("childName").value;
+  const pin = document.getElementById("childPin").value;
+  if(!name || !pin) return alert("Vul naam en PIN in");
+
+  const id = db.ref("children").push().key;
+  db.ref("children/" + id).set({
+    name: name,
+    pin: pin,
+    points: 0,
+    parent: currentUser
+  });
+
+  alert("Kind toegevoegd!");
+  document.getElementById("childName").value = "";
+  document.getElementById("childPin").value = "";
+  renderParent();
+}
+
+// Geef punten direct aan kind
+function addPoints() {
+  const name = document.getElementById("pointsChildName").value;
+  const pts = parseInt(document.getElementById("extraPoints").value);
+  if(!name || !pts) return alert("Vul naam en punten in");
+
+  db.ref("children").orderByChild("name").equalTo(name).once("value", snap => {
+    let found = false;
+    snap.forEach(c => {
+      found = true;
+      db.ref("children/" + c.key + "/points").transaction(p => (p || 0) + pts);
+    });
+    if(!found) alert("Kind niet gevonden");
+  });
+
+  document.getElementById("pointsChildName").value = "";
+  document.getElementById("extraPoints").value = "";
+}
+
+// Render lijst van kinderen
+function renderParent() {
+  db.ref("children").orderByChild("parent").equalTo(currentUser).on("value", snap => {
+    let html = "";
+    snap.forEach(c => {
+      html += `<li>${c.val().name} - ${c.val().points} punten</li>`;
+    });
+    document.getElementById("childrenList").innerHTML = html;
+  });
+}
 
   function addTask(){
     const task = document.getElementById("taskName").value;
