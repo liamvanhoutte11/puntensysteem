@@ -263,27 +263,8 @@ function save() {
   localStorage.setItem("puntenData", JSON.stringify(data));
 }
 
-// Registreer ouder
-function registerParent() {
-  const name = document.getElementById("loginName").value;
-  const pass = document.getElementById("loginPassword").value;
 
-  if (!name || !pass) {
-    alert("Vul een naam en wachtwoord in");
-    return;
-  }
-
-  if (data.parent) {
-    alert("Er bestaat al een ouderaccount!");
-    return;
-  }
-
-  data.parent = { name: name, pass: pass };
-  save();
-  alert("Ouder geregistreerd, je kunt nu inloggen.");
-}
-
-    // Data opslaan in localStorage
+// Data opslaan in localStorage
 let data = JSON.parse(localStorage.getItem("puntenData")) || {
   parent: null,
   children: [],
@@ -311,7 +292,65 @@ function registerParent() {
   }
 
   if (data.parent) {
-    alert("Er bestaat al een oude
+    alert("Er bestaat al een ouderaccount!");
+    return;
+  }
+
+  data.parent = { name: name, pass: pass };
+  save();
+  alert("Ouder geregistreerd! Je kunt nu inloggen.");
+}
+
+// Login ouder
+function loginParent() {
+  const name = document.getElementById("loginName").value;
+  const pass = document.getElementById("loginPassword").value;
+
+  if (data.parent && data.parent.name === name && data.parent.pass === pass) {
+    currentUser = name;
+    isParent = true;
+    showParentPanel();
+  } else {
+    alert("Ongeldige ouder login");
+  }
+}
+
+// Login kind
+function loginChild() {
+  const name = document.getElementById("loginName").value;
+  const pin = document.getElementById("loginPassword").value;
+
+  const child = data.children.find(c => c.name === name && c.pin === pin);
+
+  if (child) {
+    currentUser = child.name;
+    isParent = false;
+    showChildPanel();
+  } else {
+    alert("Ongeldige kind login");
+  }
+}
+
+// Navigatie
+function showParentPanel() {
+  document.getElementById("loginScreen").style.display = "none";
+  document.getElementById("parentPanel").style.display = "block";
+  document.getElementById("childPanel").style.display = "none";
+}
+
+function showChildPanel() {
+  document.getElementById("loginScreen").style.display = "none";
+  document.getElementById("parentPanel").style.display = "none";
+  document.getElementById("childPanel").style.display = "block";
+}
+
+function logout() {
+  currentUser = null;
+  isParent = false;
+  document.getElementById("loginScreen").style.display = "block";
+  document.getElementById("parentPanel").style.display = "none";
+  document.getElementById("childPanel").style.display = "none";
+}
 
 
   // --- Uitloggen ---
