@@ -87,72 +87,144 @@
   </style>
 </head>
 <body>
-  <!-- Login scherm -->
-  <div id="loginScreen">
-    <h2>Login</h2>
-    <input id="loginName" placeholder="Naam"><br>
-    <input id="loginPassword" type="password" placeholder="Wachtwoord/PIN"><br>
-    <button onclick="loginParent()">Login als ouder</button>
-    <button onclick="loginChild()">Login als kind</button>
-  </div>
+  <style>
+    body {
+      font-family: "Segoe UI", sans-serif;
+      background: #f0f4f8;
+      margin: 0;
+      padding: 0;
+    }
+    header {
+      background: #4a90e2;
+      color: white;
+      padding: 15px;
+      text-align: center;
+      font-size: 1.4rem;
+    }
+    .container {
+      max-width: 800px;
+      margin: 20px auto;
+      padding: 20px;
+    }
+    .card {
+      background: white;
+      border-radius: 12px;
+      padding: 20px;
+      margin-bottom: 20px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    }
+    input, button {
+      width: 100%;
+      margin: 8px 0;
+      padding: 10px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      font-size: 1rem;
+    }
+    button {
+      background: #4a90e2;
+      color: white;
+      border: none;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    button:hover {
+      background: #357ab7;
+    }
+    h2, h3, h4 {
+      color: #4a90e2;
+    }
+    ul {
+      list-style: none;
+      padding: 0;
+    }
+    li {
+      background: #f9f9f9;
+      margin: 5px 0;
+      padding: 10px;
+      border-radius: 8px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+  </style>
 
-  <!-- Ouder scherm -->
-  <div id="parentPanel" style="display:none;">
-    <h2>Ouder Paneel</h2>
-    <p>Welkom ouder!</p>
+  <header>Punten Systeem</header>
 
-    <!-- Kind toevoegen -->
-    <h3>Kind toevoegen</h3>
-    <input id="childName" placeholder="Naam kind"><br>
-    <input id="childPin" type="password" placeholder="Pincode kind"><br>
-    <button onclick="addChild()">Voeg kind toe</button>
-    <ul id="childrenList"></ul>
+  <div class="container">
+    <!-- Login scherm -->
+    <div id="loginScreen" class="card">
+      <h2>Login</h2>
+      <input id="loginName" placeholder="Naam">
+      <input id="loginPassword" type="password" placeholder="Wachtwoord/PIN">
+      <button onclick="loginParent()">Login als ouder</button>
+      <button onclick="loginChild()">Login als kind</button>
+    </div>
 
-    <!-- Punten geven -->
-    <h3>Punten geven</h3>
-    <input id="pointsChildName" placeholder="Naam kind"><br>
-    <input id="pointsAmount" type="number" placeholder="Aantal punten"><br>
-    <button onclick="givePoints()">Geef punten</button>
+    <!-- Ouder scherm -->
+    <div id="parentPanel" class="card" style="display:none;">
+      <h2>Ouder Paneel</h2>
 
-    <!-- Taken beheren -->
-    <h3>Taken beheren</h3>
-    <input id="taskName" placeholder="Taak"><br>
-    <input id="taskPoints" type="number" placeholder="Punten"><br>
-    <button onclick="addTask()">Voeg taak toe</button>
-    <ul id="tasksList"></ul>
+      <div class="card">
+        <h3>Kind toevoegen</h3>
+        <input id="childName" placeholder="Naam kind">
+        <input id="childPin" type="password" placeholder="Pincode kind">
+        <button onclick="addChild()">Voeg kind toe</button>
+        <ul id="childrenList"></ul>
+      </div>
 
-    <!-- Beloningen beheren -->
-    <h3>Beloningen beheren</h3>
-    <input id="rewardName" placeholder="Beloning"><br>
-    <input id="rewardCost" type="number" placeholder="Kosten"><br>
-    <button onclick="addReward()">Voeg beloning toe</button>
-    <ul id="rewardsList"></ul>
+      <div class="card">
+        <h3>Punten geven</h3>
+        <input id="pointsChildName" placeholder="Naam kind">
+        <input id="pointsAmount" type="number" placeholder="Aantal punten">
+        <button onclick="givePoints()">Geef punten</button>
+      </div>
 
-    <!-- Goedkeuringen -->
-    <h3>Goedkeuringen</h3>
-    <h4>Taak verzoeken</h4>
-    <ul id="taskRequests"></ul>
-    <h4>Beloning verzoeken</h4>
-    <ul id="rewardRequests"></ul>
+      <div class="card">
+        <h3>Taken beheren</h3>
+        <input id="taskName" placeholder="Taak">
+        <input id="taskPoints" type="number" placeholder="Punten">
+        <button onclick="addTask()">Voeg taak toe</button>
+        <ul id="tasksList"></ul>
+      </div>
 
-    <button onclick="logout()">Uitloggen</button>
-  </div>
+      <div class="card">
+        <h3>Beloningen beheren</h3>
+        <input id="rewardName" placeholder="Beloning">
+        <input id="rewardCost" type="number" placeholder="Kosten">
+        <button onclick="addReward()">Voeg beloning toe</button>
+        <ul id="rewardsList"></ul>
+      </div>
 
-  <!-- Kind scherm -->
-  <div id="childPanel" style="display:none;">
-    <h2>Kind Paneel</h2>
-    <p>Welkom kind!</p>
-    <p>Jouw punten: <span id="childPoints">0</span></p>
+      <div class="card">
+        <h3>Goedkeuringen</h3>
+        <h4>Taak verzoeken</h4>
+        <ul id="taskRequests"></ul>
+        <h4>Beloning verzoeken</h4>
+        <ul id="rewardRequests"></ul>
+      </div>
 
-    <!-- Taken -->
-    <h3>Beschikbare taken</h3>
-    <ul id="childTasks"></ul>
+      <button onclick="logout()">Uitloggen</button>
+    </div>
 
-    <!-- Beloningen -->
-    <h3>Beschikbare beloningen</h3>
-    <ul id="childRewards"></ul>
+    <!-- Kind scherm -->
+    <div id="childPanel" class="card" style="display:none;">
+      <h2>Kind Paneel</h2>
+      <p>Welkom kind!</p>
+      <p><b>Jouw punten:</b> <span id="childPoints">0</span></p>
 
-    <button onclick="logout()">Uitloggen</button>
+      <div class="card">
+        <h3>Beschikbare taken</h3>
+        <ul id="childTasks"></ul>
+      </div>
+
+      <div class="card">
+        <h3>Beschikbare beloningen</h3>
+        <ul id="childRewards"></ul>
+      </div>
+
+      <button onclick="logout()">Uitloggen</button>
+    </div>
   </div>
 
   <script>
