@@ -249,43 +249,40 @@
   let currentUser = null;
   let isParent = false;
 
-  // --- Registratie (alleen ouder) ---
-  function registerParent(){
-    const name = document.getElementById("registerName").value;
-    const pass = document.getElementById("registerPassword").value;
-    db.ref("parent").set({name: name, pass: pass});
-    alert("Ouder geregistreerd!");
+  // Opslag in localStorage (later kan dit Firebase worden)
+let data = JSON.parse(localStorage.getItem("puntenData")) || {
+  parent: null,
+  children: [],
+  tasks: [],
+  rewards: [],
+  taskRequests: [],
+  rewardRequests: []
+};
+
+function save() {
+  localStorage.setItem("puntenData", JSON.stringify(data));
+}
+
+// Registreer ouder
+function registerParent() {
+  const name = document.getElementById("loginName").value;
+  const pass = document.getElementById("loginPassword").value;
+
+  if (!name || !pass) {
+    alert("Vul een naam en wachtwoord in");
+    return;
   }
 
-  // --- Login ---
-  function login(){
-    const n = document.getElementById("loginName").value;
-    const p = document.getElementById("loginPassword").value;
-
-    // Controleer ouder
-    db.ref("parent").once("value", snap=>{
-      const parent = snap.val();
-      if(parent && parent.name === n && parent.pass === p){
-        currentUser = n;
-        isParent = true;
-        showApp();
-      } else {
-        // Controleer kind
-        db.ref("children").orderByChild("name").equalTo(n).once("value", csnap=>{
-          let found = false;
-          csnap.forEach(c=>{
-            if(c.val().pin === p){
-              currentUser = n;
-              isParent = false;
-              showApp();
-              found = true;
-            }
-          });
-          if(!found) alert("Ongeldige login");
-        });
-      }
-    });
+  if (data.parent) {
+    alert("Er bestaat al een ouderaccount!");
+    return;
   }
+
+  data.parent = { name: name, pass: pass };
+  save();
+  alert("Ouder geregistreerd, je kunt nu inloggen.");
+}
+
 
   // --- Uitloggen ---
   function logout(){
