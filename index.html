@@ -87,96 +87,72 @@
   </style>
 </head>
 <body>
-  <header>
-    <h1>🌟 Punten Systeem</h1>
-    <p>Ouders beheren taken, beloningen en punten voor kinderen</p>
-  </header>
+  <!-- Login scherm -->
+  <div id="loginScreen">
+    <h2>Login</h2>
+    <input id="loginName" placeholder="Naam"><br>
+    <input id="loginPassword" type="password" placeholder="Wachtwoord/PIN"><br>
+    <button onclick="loginParent()">Login als ouder</button>
+    <button onclick="loginChild()">Login als kind</button>
+  </div>
 
-  <div class="container">
+  <!-- Ouder scherm -->
+  <div id="parentPanel" style="display:none;">
+    <h2>Ouder Paneel</h2>
+    <p>Welkom ouder!</p>
 
-    <div id="loginCard" style="padding:20px; border:1px solid #ccc; border-radius:8px; width:300px; margin:20px auto;">
-  <h3>Login</h3>
-  <input id="loginName" placeholder="Naam" style="width:100%; margin-bottom:5px;"><br>
-  <input id="loginPassword" type="password" placeholder="Wachtwoord/PIN" style="width:100%; margin-bottom:5px;"><br>
-  <button onclick="login()" style="width:100%;">Login</button>
-</div>
+    <!-- Kind toevoegen -->
+    <h3>Kind toevoegen</h3>
+    <input id="childName" placeholder="Naam kind"><br>
+    <input id="childPin" type="password" placeholder="Pincode kind"><br>
+    <button onclick="addChild()">Voeg kind toe</button>
+    <ul id="childrenList"></ul>
 
-<div id="registerCard" style="padding:20px; border:1px solid #ccc; border-radius:8px; width:300px; margin:20px auto;">
-  <h3>Registreer als Ouder</h3>
-  <input id="registerName" placeholder="Naam" style="width:100%; margin-bottom:5px;"><br>
-  <input id="registerPassword" type="password" placeholder="Wachtwoord" style="width:100%; margin-bottom:5px;"><br>
-  <button onclick="registerParent()" style="width:100%;">Registreer</button>
-</div>
+    <!-- Punten geven -->
+    <h3>Punten geven</h3>
+    <input id="pointsChildName" placeholder="Naam kind"><br>
+    <input id="pointsAmount" type="number" placeholder="Aantal punten"><br>
+    <button onclick="givePoints()">Geef punten</button>
 
+    <!-- Taken beheren -->
+    <h3>Taken beheren</h3>
+    <input id="taskName" placeholder="Taak"><br>
+    <input id="taskPoints" type="number" placeholder="Punten"><br>
+    <button onclick="addTask()">Voeg taak toe</button>
+    <ul id="tasksList"></ul>
 
-   <div id="parentPanel" style="padding:20px; border:1px solid #ccc; border-radius:8px; width:400px; margin:20px auto; display:none;">
-  <h3>Ouder Paneel</h3>
+    <!-- Beloningen beheren -->
+    <h3>Beloningen beheren</h3>
+    <input id="rewardName" placeholder="Beloning"><br>
+    <input id="rewardCost" type="number" placeholder="Kosten"><br>
+    <button onclick="addReward()">Voeg beloning toe</button>
+    <ul id="rewardsList"></ul>
 
-  <h4>Voeg een kind toe</h4>
-  <input id="childName" placeholder="Naam kind" style="width:100%; margin-bottom:5px;"><br>
-  <input id="childPin" placeholder="PIN kind" type="password" style="width:100%; margin-bottom:5px;"><br>
-  <button onclick="addChild()" style="width:100%;">Voeg kind toe</button>
+    <!-- Goedkeuringen -->
+    <h3>Goedkeuringen</h3>
+    <h4>Taak verzoeken</h4>
+    <ul id="taskRequests"></ul>
+    <h4>Beloning verzoeken</h4>
+    <ul id="rewardRequests"></ul>
 
-  <h4>Geef punten aan kind</h4>
-  <input id="pointsChildName" placeholder="Naam kind" style="width:100%; margin-bottom:5px;"><br>
-  <input id="extraPoints" placeholder="Aantal punten" type="number" style="width:100%; margin-bottom:5px;"><br>
-  <button onclick="addPoints()" style="width:100%;">Geef punten</button>
+    <button onclick="logout()">Uitloggen</button>
+  </div>
 
-  <h4>Lijst kinderen</h4>
-  <ul id="childrenList" style="padding-left:0;"></ul>
-</div>
+  <!-- Kind scherm -->
+  <div id="childPanel" style="display:none;">
+    <h2>Kind Paneel</h2>
+    <p>Welkom kind!</p>
+    <p>Jouw punten: <span id="childPoints">0</span></p>
 
-      <div class="card">
-        <h3>Taken beheren</h3>
-        <input type="text" id="taskName" placeholder="Taaknaam">
-        <input type="number" id="taskPoints" placeholder="Punten">
-        <button onclick="addTask()">Taak toevoegen</button>
-        <ul id="tasksList"></ul>
-      </div>
-      <div class="card">
-        <h3>Beloningen beheren</h3>
-        <input type="text" id="rewardName" placeholder="Beloning">
-        <input type="number" id="rewardCost" placeholder="Kosten (punten)">
-        <button onclick="addReward()">Beloning toevoegen</button>
-        <ul id="rewardsList"></ul>
-      </div>
-      <div class="card">
-        <h3>Goedkeuringen</h3>
-        <h4>Taakaanvragen</h4>
-        <ul id="taskRequestsList"></ul>
-        <h4>Beloningsaanvragen</h4>
-        <ul id="rewardRequestsList"></ul>
-      </div>
-      <div class="card">
-        <h3>💬 Chat met kinderen</h3>
-        <div id="chatBox"></div>
-        <input type="text" id="chatMessage" placeholder="Bericht typen...">
-        <button onclick="sendMessage()">Verstuur</button>
-      </div>
-    </div>
+    <!-- Taken -->
+    <h3>Beschikbare taken</h3>
+    <ul id="childTasks"></ul>
 
-    <!-- Kind Panel -->
-    <div id="childPanel" style="display:none;">
-      <div class="card">
-        <h2>👦 Welkom, <span id="childName"></span></h2>
-        <p>Punten: <span id="childPoints">0</span></p>
-        <button class="danger" onclick="logout()">Uitloggen</button>
-      </div>
-      <div class="card">
-        <h3>Mijn Taken</h3>
-        <ul id="childTasks"></ul>
-      </div>
-      <div class="card">
-        <h3>Mijn Beloningen</h3>
-        <ul id="childRewards"></ul>
-      </div>
-      <div class="card">
-        <h3>💬 Chat met ouder</h3>
-        <div id="chatBox"></div>
-        <input type="text" id="chatMessage" placeholder="Bericht typen...">
-        <button onclick="sendMessage()">Verstuur</button>
-      </div>
-    </div>
+    <!-- Beloningen -->
+    <h3>Beschikbare beloningen</h3>
+    <ul id="childRewards"></ul>
+
+    <button onclick="logout()">Uitloggen</button>
   </div>
 
   <script>
