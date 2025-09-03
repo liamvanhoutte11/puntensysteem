@@ -154,12 +154,15 @@
   <div class="container">
     <!-- Login scherm -->
     <div id="loginScreen" class="card">
-      <h2>Login</h2>
-      <input id="loginName" placeholder="Naam">
-      <input id="loginPassword" type="password" placeholder="Wachtwoord/PIN">
-      <button onclick="loginParent()">Login als ouder</button>
-      <button onclick="loginChild()">Login als kind</button>
-    </div>
+  <h2>Login of Registreren</h2>
+  <input id="loginName" placeholder="Naam">
+  <input id="loginPassword" type="password" placeholder="Wachtwoord/PIN">
+
+  <button onclick="registerParent()">Registreer als ouder</button>
+  <button onclick="loginParent()">Login als ouder</button>
+  <button onclick="loginChild()">Login als kind</button>
+</div>
+
 
     <!-- Ouder scherm -->
     <div id="parentPanel" class="card" style="display:none;">
