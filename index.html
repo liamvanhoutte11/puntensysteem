@@ -283,6 +283,36 @@ function registerParent() {
   alert("Ouder geregistreerd, je kunt nu inloggen.");
 }
 
+    // Data opslaan in localStorage
+let data = JSON.parse(localStorage.getItem("puntenData")) || {
+  parent: null,
+  children: [],
+  tasks: [],
+  rewards: [],
+  taskRequests: [],
+  rewardRequests: []
+};
+
+let currentUser = null;
+let isParent = false;
+
+function save() {
+  localStorage.setItem("puntenData", JSON.stringify(data));
+}
+
+// Registreer ouder (eenmalig)
+function registerParent() {
+  const name = document.getElementById("loginName").value;
+  const pass = document.getElementById("loginPassword").value;
+
+  if (!name || !pass) {
+    alert("Vul een naam en wachtwoord in");
+    return;
+  }
+
+  if (data.parent) {
+    alert("Er bestaat al een oude
+
 
   // --- Uitloggen ---
   function logout(){
